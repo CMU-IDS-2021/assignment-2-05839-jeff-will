@@ -14,8 +14,9 @@ st.header("Median Home Value vs Percentage of COVID Related Doctor Visits (By Co
 st.write("In the graph below, all counties are shown. The higher the color density of the county the higher percentage of doctor\
     visits that were COVID related (01/26 to 02/26. Additionally, median household income is binned and can be toggled with the slider below.\
         Play around with the slider to see if you notice any change in color density from high to low home value counties.")
+
 #Load initial data
-COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-26-to-2021-02-26.csv")
+COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-01-to-2021-01-31.csv")
 COUNTY = pd.read_csv("health_ineq_online_table_12.csv", encoding = "latin-1")
 COUNTY["cty"] = COUNTY["cty"].astype(int)
 COVID["geo_value"] = COVID["geo_value"].astype(int)
@@ -33,56 +34,41 @@ def bin_and_log_scale(DATA, column):
     binned = "binned_col"
     DATA[ranges] = pd.qcut(np.log(DATA[column]), 5)
     DATA[binned] = pd.qcut(np.log(DATA[column]), 5, labels = False).astype(str)
-
-
     True_Values = []
-
     DATA_BINNED_GROUPBY = DATA.groupby(by = ["binned_col"]).mean()
     value_list = ((DATA_BINNED_GROUPBY["value"]).tolist())
     DATA_BINNED_GROUPBY["mean_value"] = DATA_BINNED_GROUPBY["value"]
     DATA_BINNED_GROUPBY = DATA_BINNED_GROUPBY["mean_value"]
-    
     bins_list = DATA[ranges].unique().tolist()
     for i in range (5):
         left_value = np.exp(bins_list[i].left)
         right_value = np.exp(bins_list[i].right)
         True_Values.append(left_value)
         True_Values.append(right_value)
-
     True_Values = (np.sort(np.asarray(True_Values).astype(float)))
-    
     True_Values_Return = []
-    
     for i in range (15):
         if (i%3 == 0):
             True_Values_Return.append(True_Values[int((i*2)/3)])
         elif (i%3 == 1):
             True_Values_Return.append(True_Values[int((i*2)/3) + 1])
         else:
-            True_Values_Return.append(value_list[int(i/3)])
-            
+            True_Values_Return.append(value_list[int(i/3)])     
     DATA_BINNED_GROUPBY = DATA_BINNED_GROUPBY.reset_index()
     DATA_BINNED_GROUPBY["binned_col"] = DATA_BINNED_GROUPBY["binned_col"].astype(str)
     DATA_BINNED_GROUPBY = DATA_BINNED_GROUPBY.set_index("binned_col")
-
-    DATA = DATA.join(DATA_BINNED_GROUPBY, how = "inner", on = "binned_col")
-        
-                        
+    DATA = DATA.join(DATA_BINNED_GROUPBY, how = "inner", on = "binned_col")                     
     return DATA, True_Values_Return
-
 
 DATA, True_Home_Values = bin_and_log_scale(DATA, "median_house_value")
 
 def create_map(DATA_MAP, FIPS_NAME, binned_col, value_col, SCHEME, low_scale, high_scale):
-    
     DATA_MAP[value_col] = DATA_MAP[value_col].astype(float)
     #Laod US Counties by FIPS
     us_counties = alt.topo_feature(data.us_10m.url, 'counties')
-
     #Pivot the PD Dataframe such that the columns are each bin of home value and rows are indexed by FIPS Code
     DATA_MAP = DATA_MAP.pivot(index=FIPS_NAME, columns=binned_col, values=value_col).reset_index()
     columns = DATA_MAP.columns[1:6].tolist()
-
     #Create the slider
     slider = alt.binding_range(min=0, max=4, step=1)
     select_home_value_level = alt.selection_single(name=binned_col, fields=[binned_col],
@@ -114,8 +100,7 @@ def create_map(DATA_MAP, FIPS_NAME, binned_col, value_col, SCHEME, low_scale, hi
         height=400
     ).transform_filter(
         select_home_value_level
-    )
-    
+    ) 
     return chart
 
 
@@ -147,7 +132,6 @@ COUNTY2 = pd.read_csv("cty_covariates.csv", encoding = "latin1")
 COUNTY2["FIPS"] = (COUNTY2["state"]*1000 + COUNTY2["county"]).astype(int)
 #Conduct Inner Join on FIPS County Code
 DATA = COUNTY2.join(COVID.set_index("geo_value"), how = "inner", on = "FIPS")
-
 #Aggregate Data by Day, using mean....COVID Doctor Visit Data is daily
 DATA = DATA.groupby("FIPS").mean().reset_index()
 
@@ -155,6 +139,7 @@ DATA, True_Inc_Values = bin_and_log_scale(DATA, "hhinc_mean2000")
 
 chart = create_map(DATA, "FIPS", "binned_col", "mean_value", "greens", 7.5, 10)
 st.write(chart)
+
 st.write("Again, it seems like the counties with the highest percentage of COVID Doctor visits are both the poorest and richest counties.")
 
 True_Inc_Values = np.reshape(True_Inc_Values, (5, 3))
@@ -175,20 +160,11 @@ COVID = pd.read_csv("covidcast-indicator-combination-confirmed_incidence_prop-20
 COUNTY = pd.read_csv("health_ineq_online_table_12.csv", encoding = "latin-1")
 COUNTY["cty"] = COUNTY["cty"].astype(int)
 COVID["geo_value"] = COVID["geo_value"].astype(int)
-
 #Conduct Inner Join on FIPS County Code
 DATA = COUNTY.join(COVID.set_index("geo_value"), how = "inner", on = "cty")
-
 #Aggregate Data by Day, using mean....COVID Doctor Visit Data is daily
 DATA = DATA.groupby("cty").mean().reset_index()
-
 DATA = DATA[(DATA["median_house_value"] != 0)]
-
-#Conduct Inner Join on FIPS County Code
-DATA = COUNTY.join(COVID.set_index("geo_value"), how = "inner", on = "cty")
-
-#Aggregate Data by Day, using mean....COVID Doctor Visit Data is daily
-DATA = DATA.groupby("cty").mean().reset_index()
 
 DATA, True_Home_Values = bin_and_log_scale(DATA, "median_house_value")
 
@@ -208,19 +184,15 @@ st.write("Wow! This one is even more even out throughout the ranks of society. L
 st.header("Median Income vs Percentage of COVID Deaths (By County)")
 
 #This data set does not come with FIPS so we have to create it by appending state and county FIPS
-#This data set does not come with FIPS so we have to create it by appending state and county FIPS
 COUNTY2["FIPS"] = (COUNTY2["state"]*1000 + COUNTY2["county"]).astype(int)
 #Conduct Inner Join on FIPS County Code
 DATA = COUNTY2.join(COVID.set_index("geo_value"), how = "inner", on = "FIPS")
-
 #Aggregate Data by Day, using mean....COVID Doctor Visit Data is daily
 DATA = DATA.groupby("FIPS").mean().reset_index()
 DATA = DATA.dropna(subset = ["hhinc_mean2000"])
 DATA = DATA[(DATA["hhinc_mean2000"] != 0)]
 
 #Aggregate Data by Day, using mean....COVID Doctor Visit Data is daily
-
-
 DATA, True_Inc_Values = bin_and_log_scale(DATA, "hhinc_mean2000")
 
 
