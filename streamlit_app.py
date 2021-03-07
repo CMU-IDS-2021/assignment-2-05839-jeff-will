@@ -11,9 +11,9 @@ st.write("In order to figure this out, we'll look out two measures of wealth and
 
 st.header("Median Home Value vs Percentage of COVID Related Doctor Visits (By County")
 
-st.write("In the graph below, all counties are shown. The higher the color density of the county the higher percentage of doctor\
-    visits that were COVID related (01/26 to 02/26. Additionally, median household income is binned and can be toggled with the slider below.\
-        Play around with the slider to see if you notice any change in color density from high to low home value counties.")
+st.write("Feel free to manipulate the slider below!")
+st.write("The higher the bin number on the slider, the more wealthy the counties shown are.")
+st.write("The higher the color density, the higher the percentage of Doctor Visits that are COVID related.")
 
 #Load initial data
 COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-01-to-2021-01-31.csv")
@@ -107,11 +107,6 @@ def create_map(DATA_MAP, FIPS_NAME, binned_col, value_col, SCHEME, low_scale, hi
 chart = create_map(DATA, "cty", "binned_col", "mean_value", "greens", 7.5, 9.5)
 st.write(chart)
 
-st.write("At first it may seem like there is no noticeable effect. There is one interesting \
-    observation that the home values in the middle of the range seem to have very low COVID doctor visits\
-        while the richest and the poorest have the highest COVID Doctor visits. This may be the result of 2 phenomenon. The\
-            rich have time to visit the docor more for COVID while the poor are still more likely to be affected by it.")
-
 
 True_Home_Values = np.reshape(True_Home_Values, (5, 3))
 TRUE_HOME_VALUES = pd.DataFrame(True_Home_Values, columns = ['Median Home Value Bin Lower', 'Median Home Value Bin Upper', 'Percent of Doctor Visits COVID Related'])
@@ -121,9 +116,6 @@ TRUE_HOME_VALUES = TRUE_HOME_VALUES.astype(str)
 TRUE_HOME_VALUES['Median Home Value Bin Lower'] = '$' + TRUE_HOME_VALUES['Median Home Value Bin Lower']
 TRUE_HOME_VALUES['Median Home Value Bin Upper'] = '$' + TRUE_HOME_VALUES['Median Home Value Bin Upper']
 st.write(TRUE_HOME_VALUES)
-
-
-st.write("Let's consider another measure of wealth, median income, and see if we notice the same phenomenon.")
 
 st.header("Median Income vs Percentage of COVID Related Doctor Visits (By County)")
 
@@ -140,8 +132,6 @@ DATA, True_Inc_Values = bin_and_log_scale(DATA, "hhinc_mean2000")
 chart = create_map(DATA, "FIPS", "binned_col", "mean_value", "greens", 7.5, 10)
 st.write(chart)
 
-st.write("Again, it seems like the counties with the highest percentage of COVID Doctor visits are both the poorest and richest counties.")
-
 True_Inc_Values = np.reshape(True_Inc_Values, (5, 3))
 INC_VALUES = pd.DataFrame(True_Inc_Values, columns = ['Median Income Bin Lower', 'Median Income Bin Upper', 'Percent of Doctor Visits COVID Related'])
 #pd.options.display.float_format = "{:,.2f}".format
@@ -151,9 +141,11 @@ INC_VALUES['Median Income Bin Lower'] = '$' + INC_VALUES['Median Income Bin Lowe
 INC_VALUES['Median Income Bin Upper'] = '$' + INC_VALUES['Median Income Bin Upper']
 st.write(INC_VALUES)
 
-st.write("Perhaps percentage of COVID Doctor Visits is a bit obfuscated. Let's look at a more grim measure, COVID related Deaths.")
-
 st.header("Median Home Value vs Percentage of COVID Deaths (By County")
+
+st.write("Feel free to manipulate the slider below!")
+st.write("The higher the bin number on the slider, the more wealthy the counties shown are.")
+st.write("The higher the color density, the higher the COVID realted deaths are per capita.")
 
 COVID = pd.read_csv("covidcast-indicator-combination-confirmed_incidence_prop-2021-01-26-to-2021-01-26.csv")
 #COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-01-to-2021-01-31.csv")
@@ -180,7 +172,6 @@ TRUE_HOME_VALUES['Median Home Value Bin Lower'] = '$' + TRUE_HOME_VALUES['Median
 TRUE_HOME_VALUES['Median Home Value Bin Upper'] = '$' + TRUE_HOME_VALUES['Median Home Value Bin Upper']
 st.write(TRUE_HOME_VALUES)
 
-st.write("Wow! This one is even more even out throughout the ranks of society. Let's look at how COVID realted deaths realte to median income.")
 st.header("Median Income vs Percentage of COVID Deaths (By County)")
 
 #This data set does not come with FIPS so we have to create it by appending state and county FIPS
