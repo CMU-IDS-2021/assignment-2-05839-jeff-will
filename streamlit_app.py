@@ -9,7 +9,7 @@ st.title("Does COVID Affect the Rich Differently than the Poor?")
 st.write("In order to figure this out, we'll look out two measures of wealth and two measures\
     of COVID effects.")
 
-st.header("Median Home Value vs Percentage of COVID Related Doctor Visits (By County")
+st.header("Median Home Value vs Percentage of COVID Related Doctor Visits (By County)")
 
 st.write("Feel free to manipulate the slider below!")
 st.write("The higher the bin number on the slider, the more wealthy the counties shown are.")
@@ -107,7 +107,6 @@ def create_map(DATA_MAP, FIPS_NAME, binned_col, value_col, SCHEME, low_scale, hi
 chart = create_map(DATA, "cty", "binned_col", "mean_value", "greens", 7.5, 9.5)
 st.write(chart)
 
-
 True_Home_Values = np.reshape(True_Home_Values, (5, 3))
 TRUE_HOME_VALUES = pd.DataFrame(True_Home_Values, columns = ['Median Home Value Bin Lower', 'Median Home Value Bin Upper', 'Percent of Doctor Visits COVID Related'])
 #pd.options.display.float_format = "{:,.2f}".format
@@ -116,6 +115,9 @@ TRUE_HOME_VALUES = TRUE_HOME_VALUES.astype(str)
 TRUE_HOME_VALUES['Median Home Value Bin Lower'] = '$' + TRUE_HOME_VALUES['Median Home Value Bin Lower']
 TRUE_HOME_VALUES['Median Home Value Bin Upper'] = '$' + TRUE_HOME_VALUES['Median Home Value Bin Upper']
 st.write(TRUE_HOME_VALUES)
+st.write("Note how the coutnies with the higher home values visit the doctor much more often for COVID. Is this because they have it as a commodity? \
+Or because they are more affected by it? Let's look at another measure of wealth, income!")
+
 
 st.header("Median Income vs Percentage of COVID Related Doctor Visits (By County)")
 
@@ -140,8 +142,11 @@ INC_VALUES = INC_VALUES.astype(str)
 INC_VALUES['Median Income Bin Lower'] = '$' + INC_VALUES['Median Income Bin Lower']
 INC_VALUES['Median Income Bin Upper'] = '$' + INC_VALUES['Median Income Bin Upper']
 st.write(INC_VALUES)
+st.write("As expected we can again see how the richest counties visit the doctor much more often for COVID, indicated by the dark shade the highest bin has.")
+st.write("Perhaps these rich counties are simply more affected by COVID. In order to observe this let's look at COVID Death rates.")
 
-st.header("Median Home Value vs Percentage of COVID Deaths (By County")
+
+st.header("Median Home Value vs Percentage of COVID Deaths (By County)")
 
 st.write("Feel free to manipulate the slider below!")
 st.write("The higher the bin number on the slider, the more wealthy the counties shown are.")
@@ -190,7 +195,6 @@ DATA, True_Inc_Values = bin_and_log_scale(DATA, "hhinc_mean2000")
 chart = create_map(DATA, "FIPS", "binned_col", "mean_value", "reds", 30, 90)
 st.write(chart)
 
-
 True_Inc_Values = np.reshape(True_Inc_Values, (5, 3))
 INC_VALUES = pd.DataFrame(True_Inc_Values, columns = ['Median Income Bin Lower', 'Median Income Bin Upper', 'COVID Deaths per 100,000 People'])
 #pd.options.display.float_format = "{:,.2f}".format
@@ -199,3 +203,6 @@ INC_VALUES = INC_VALUES.astype(str)
 INC_VALUES['Median Income Bin Lower'] = '$' + INC_VALUES['Median Income Bin Lower']
 INC_VALUES['Median Income Bin Upper'] = '$' + INC_VALUES['Median Income Bin Upper']
 st.write(INC_VALUES)
+st.write("In both of these charts we can see that COVID death rates (per 1000000 people) are pretty standard but much higher for\
+the richest counties. This explains the phenomon with doctor visits, but with any data there could be other factors obfuscating the results.")
+
