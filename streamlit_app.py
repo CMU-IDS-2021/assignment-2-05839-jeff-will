@@ -31,27 +31,49 @@ def bin_and_log_scale(DATA, column):
     #Bin Home value for slider operations
     ranges = column + "_ranges"
     binned = "binned_col"
-    DATA[ranges] = pd.cut(np.log(DATA[column]), 10)
-    DATA[binned] = pd.cut(np.log(DATA[column]), 10, labels = False).astype(str)
+    DATA[ranges] = pd.qcut(np.log(DATA[column]), 5)
+    DATA[binned] = pd.qcut(np.log(DATA[column]), 5, labels = False).astype(str)
 
 
     True_Values = []
 
-
+    DATA_BINNED_GROUPBY = DATA.groupby(by = ["binned_col"]).mean()
+    value_list = ((DATA_BINNED_GROUPBY["value"]).tolist())
+    DATA_BINNED_GROUPBY["mean_value"] = DATA_BINNED_GROUPBY["value"]
+    DATA_BINNED_GROUPBY = DATA_BINNED_GROUPBY["mean_value"]
+    
     bins_list = DATA[ranges].unique().tolist()
-    for i in range (10):
+    for i in range (5):
         left_value = np.exp(bins_list[i].left)
         right_value = np.exp(bins_list[i].right)
         True_Values.append(left_value)
         True_Values.append(right_value)
 
     True_Values = (np.sort(np.asarray(True_Values).astype(float)))
+    
+    True_Values_Return = []
+    
+    for i in range (15):
+        if (i%3 == 0):
+            True_Values_Return.append(True_Values[int((i*2)/3)])
+        elif (i%3 == 1):
+            True_Values_Return.append(True_Values[int((i*2)/3) + 1])
+        else:
+            True_Values_Return.append(value_list[int(i/3)])
+            
+    DATA_BINNED_GROUPBY = DATA_BINNED_GROUPBY.reset_index()
+    DATA_BINNED_GROUPBY["binned_col"] = DATA_BINNED_GROUPBY["binned_col"].astype(str)
+    DATA_BINNED_GROUPBY = DATA_BINNED_GROUPBY.set_index("binned_col")
+
+    DATA = DATA.join(DATA_BINNED_GROUPBY, how = "inner", on = "binned_col")
+        
                         
-    return DATA, True_Values
+    return DATA, True_Values_Return
+
 
 DATA, True_Home_Values = bin_and_log_scale(DATA, "median_house_value")
 
-def create_map(DATA_MAP, FIPS_NAME, binned_col, value_col, SCHEME):
+def create_map(DATA_MAP, FIPS_NAME, binned_col, value_col, SCHEME, low_scale, high_scale):
     
     DATA_MAP[value_col] = DATA_MAP[value_col].astype(float)
     #Laod US Counties by FIPS
@@ -59,10 +81,10 @@ def create_map(DATA_MAP, FIPS_NAME, binned_col, value_col, SCHEME):
 
     #Pivot the PD Dataframe such that the columns are each bin of home value and rows are indexed by FIPS Code
     DATA_MAP = DATA_MAP.pivot(index=FIPS_NAME, columns=binned_col, values=value_col).reset_index()
-    columns = DATA_MAP.columns[1:10].tolist()
+    columns = DATA_MAP.columns[1:6].tolist()
 
     #Create the slider
-    slider = alt.binding_range(min=0, max=9, step=1)
+    slider = alt.binding_range(min=0, max=4, step=1)
     select_home_value_level = alt.selection_single(name=binned_col, fields=[binned_col],
                                        bind=slider, init={binned_col: 0})
     #Create the chart
@@ -83,7 +105,7 @@ def create_map(DATA_MAP, FIPS_NAME, binned_col, value_col, SCHEME):
         tooltip = ['value:Q', 'county_name:N'],
         color = alt.condition(
             'datum.value > 0',
-            alt.Color('value:Q', scale=alt.Scale(scheme=SCHEME, domain=[0, 50])),
+            alt.Color('value:Q', scale=alt.Scale(scheme=SCHEME, domain=[low_scale, high_scale])),
             alt.value('#FFFFFF')
         )).add_selection(
         select_home_value_level
@@ -96,7 +118,8 @@ def create_map(DATA_MAP, FIPS_NAME, binned_col, value_col, SCHEME):
     
     return chart
 
-chart = create_map(DATA, "cty", "binned_col", "value", "greens")
+
+chart = create_map(DATA, "cty", "binned_col", "mean_value", "greens", 7.5, 9.5)
 st.write(chart)
 
 st.write("At first it may seem like there is no noticeable effect. There is one interesting \
@@ -105,8 +128,8 @@ st.write("At first it may seem like there is no noticeable effect. There is one 
             rich have time to visit the docor more for COVID while the poor are still more likely to be affected by it.")
 
 
-True_Home_Values = np.reshape(True_Home_Values, (10, 2))
-TRUE_HOME_VALUES = pd.DataFrame(True_Home_Values, columns = ['Median Home Value Bin Lower', 'Median Home Value Bin Upper'])
+True_Home_Values = np.reshape(True_Home_Values, (5, 3))
+TRUE_HOME_VALUES = pd.DataFrame(True_Home_Values, columns = ['Median Home Value Bin Lower', 'Median Home Value Bin Upper', 'Percent of Doctor Visits COVID Related'])
 #pd.options.display.float_format = "{:,.2f}".format
 TRUE_HOME_VALUES = TRUE_HOME_VALUES.round(2)
 TRUE_HOME_VALUES = TRUE_HOME_VALUES.astype(str)
@@ -130,12 +153,12 @@ DATA = DATA.groupby("FIPS").mean().reset_index()
 
 DATA, True_Inc_Values = bin_and_log_scale(DATA, "hhinc_mean2000")
 
-chart = create_map(DATA, "FIPS", "binned_col", "value", "greens")
+chart = create_map(DATA, "FIPS", "binned_col", "mean_value", "greens", 7.5, 10)
 st.write(chart)
 st.write("Again, it seems like the counties with the highest percentage of COVID Doctor visits are both the poorest and richest counties.")
 
-True_Inc_Values = np.reshape(True_Inc_Values, (10, 2))
-INC_VALUES = pd.DataFrame(True_Inc_Values, columns = ['Median Income Bin Lower', 'Median Income Bin Upper'])
+True_Inc_Values = np.reshape(True_Inc_Values, (5, 3))
+INC_VALUES = pd.DataFrame(True_Inc_Values, columns = ['Median Income Bin Lower', 'Median Income Bin Upper', 'Percent of Doctor Visits COVID Related'])
 #pd.options.display.float_format = "{:,.2f}".format
 INC_VALUES = INC_VALUES.round(2)
 INC_VALUES = INC_VALUES.astype(str)
@@ -147,7 +170,8 @@ st.write("Perhaps percentage of COVID Doctor Visits is a bit obfuscated. Let's l
 
 st.header("Median Home Value vs Percentage of COVID Deaths (By County")
 
-COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-01-to-2021-01-31.csv")
+COVID = pd.read_csv("covidcast-indicator-combination-confirmed_incidence_prop-2021-01-26-to-2021-01-26.csv")
+#COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-01-to-2021-01-31.csv")
 COUNTY = pd.read_csv("health_ineq_online_table_12.csv", encoding = "latin-1")
 COUNTY["cty"] = COUNTY["cty"].astype(int)
 COVID["geo_value"] = COVID["geo_value"].astype(int)
@@ -158,13 +182,21 @@ DATA = COUNTY.join(COVID.set_index("geo_value"), how = "inner", on = "cty")
 #Aggregate Data by Day, using mean....COVID Doctor Visit Data is daily
 DATA = DATA.groupby("cty").mean().reset_index()
 
+DATA = DATA[(DATA["median_house_value"] != 0)]
+
+#Conduct Inner Join on FIPS County Code
+DATA = COUNTY.join(COVID.set_index("geo_value"), how = "inner", on = "cty")
+
+#Aggregate Data by Day, using mean....COVID Doctor Visit Data is daily
+DATA = DATA.groupby("cty").mean().reset_index()
+
 DATA, True_Home_Values = bin_and_log_scale(DATA, "median_house_value")
 
-chart = create_map(DATA, "cty", "binned_col", "value", "reds")
+chart = create_map(DATA, "cty", "binned_col", "mean_value", "reds", 30, 90)
 st.write(chart)
 
-True_Home_Values = np.reshape(True_Home_Values, (10, 2))
-TRUE_HOME_VALUES = pd.DataFrame(True_Home_Values, columns = ['Median Home Value Bin Lower', 'Median Home Value Bin Upper'])
+True_Home_Values = np.reshape(True_Home_Values, (5, 3))
+TRUE_HOME_VALUES = pd.DataFrame(True_Home_Values, columns = ['Median Home Value Bin Lower', 'Median Home Value Bin Upper', 'COVID Deaths per 100,000 People'])
 #pd.options.display.float_format = "{:,.2f}".format
 TRUE_HOME_VALUES = TRUE_HOME_VALUES.round(2)
 TRUE_HOME_VALUES = TRUE_HOME_VALUES.astype(str)
@@ -176,22 +208,28 @@ st.write("Wow! This one is even more even out throughout the ranks of society. L
 st.header("Median Income vs Percentage of COVID Deaths (By County)")
 
 #This data set does not come with FIPS so we have to create it by appending state and county FIPS
+#This data set does not come with FIPS so we have to create it by appending state and county FIPS
 COUNTY2["FIPS"] = (COUNTY2["state"]*1000 + COUNTY2["county"]).astype(int)
 #Conduct Inner Join on FIPS County Code
 DATA = COUNTY2.join(COVID.set_index("geo_value"), how = "inner", on = "FIPS")
 
 #Aggregate Data by Day, using mean....COVID Doctor Visit Data is daily
 DATA = DATA.groupby("FIPS").mean().reset_index()
+DATA = DATA.dropna(subset = ["hhinc_mean2000"])
+DATA = DATA[(DATA["hhinc_mean2000"] != 0)]
+
+#Aggregate Data by Day, using mean....COVID Doctor Visit Data is daily
+
 
 DATA, True_Inc_Values = bin_and_log_scale(DATA, "hhinc_mean2000")
 
 
-chart = create_map(DATA, "FIPS", "binned_col", "value", "reds")
+chart = create_map(DATA, "FIPS", "binned_col", "mean_value", "reds", 30, 90)
 st.write(chart)
 
 
-True_Inc_Values = np.reshape(True_Inc_Values, (10, 2))
-INC_VALUES = pd.DataFrame(True_Inc_Values, columns = ['Median Income Bin Lower', 'Median Income Bin Upper'])
+True_Inc_Values = np.reshape(True_Inc_Values, (5, 3))
+INC_VALUES = pd.DataFrame(True_Inc_Values, columns = ['Median Income Bin Lower', 'Median Income Bin Upper', 'COVID Deaths per 100,000 People'])
 #pd.options.display.float_format = "{:,.2f}".format
 INC_VALUES = INC_VALUES.round(2)
 INC_VALUES = INC_VALUES.astype(str)
