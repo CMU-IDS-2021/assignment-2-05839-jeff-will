@@ -15,7 +15,7 @@ st.write("In the graph below, all counties are shown. The higher the color densi
     visits that were COVID related (01/26 to 02/26. Additionally, median household income is binned and can be toggled with the slider below.\
         Play around with the slider to see if you notice any change in color density from high to low home value counties.")
 #Load initial data
-COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-01-to-2021-01-31.csv")
+COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-26-to-2021-02-26.csv")
 COUNTY = pd.read_csv("health_ineq_online_table_12.csv", encoding = "latin-1")
 COUNTY["cty"] = COUNTY["cty"].astype(int)
 COVID["geo_value"] = COVID["geo_value"].astype(int)
