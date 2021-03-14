@@ -20,29 +20,28 @@ alt.data_transformers.disable_max_rows()
 
 slider = alt.binding_range(min=1, max=31, step=2)
 select_date = alt.selection_single(name="January", fields=['Date'], bind=slider, init={'Date':1})
-
 state_selector = alt.selection_multi(fields=['statename'], init=[{'statename':'Pennsylvania'}])
 
-States = alt.Chart(DATA).mark_bar().encode(
-    x=alt.X('value:Q', title="% of Visits to Doctor about COVID", aggregate="mean", scale=alt.Scale(domain=[0, 35])),
-    y=alt.Y('statename:N', title="State"),
-    color=alt.condition(state_selector, alt.value("#f76f5c"), alt.value("#451076")),
-    tooltip=[alt.Tooltip("statename:N", title='State'), alt.Tooltip("value:Q", aggregate="mean", title="% of COVID Doctor Visits", format='.2f')]
-    ).add_selection(
-        state_selector
-    ).add_selection(
-        select_date
-    ).transform_filter(
-        select_date).interactive()
+# States = alt.Chart(DATA).mark_bar().encode(
+#     x=alt.X('value:Q', title="% of Visits to Doctor about COVID", aggregate="mean", scale=alt.Scale(domain=[0, 35])),
+#     y=alt.Y('statename:N', title="State"),
+#     color=alt.condition(state_selector, alt.value("#f76f5c"), alt.value("#451076")),
+#     tooltip=[alt.Tooltip("statename:N", title='State'), alt.Tooltip("value:Q", aggregate="mean", title="% of COVID Doctor Visits", format='.2f')]
+#     ).add_selection(
+#         state_selector
+#     ).add_selection(
+#         select_date
+#     ).transform_filter(
+#         select_date).interactive()
 
-Counties = alt.Chart(DATA).mark_bar(color='#451076').encode(
-    x=alt.X('value:Q', title="% of Visits to Doctor about COVID", scale=alt.Scale(domain=[0,35])),
-    y=alt.Y('county_name:N', title = "County"),
-    tooltip=[alt.Tooltip("statename:N", title='State'), alt.Tooltip("county_name:N", title='County'),alt.Tooltip("value:Q", aggregate="mean", title="% of COVID Doctor Visits", format='.2f'), alt.Tooltip("puninsured2010:Q", aggregate="mean", title="% Uninsured (as of 2010)", format='.2f')]
-    ).transform_filter(
-        state_selector & select_date).interactive()
-joint_chart = States | Counties
-st.write(joint_chart)
+# Counties = alt.Chart(DATA).mark_bar(color='#451076').encode(
+#     x=alt.X('value:Q', title="% of Visits to Doctor about COVID", scale=alt.Scale(domain=[0,35])),
+#     y=alt.Y('county_name:N', title = "County"),
+#     tooltip=[alt.Tooltip("statename:N", title='State'), alt.Tooltip("county_name:N", title='County'),alt.Tooltip("value:Q", aggregate="mean", title="% of COVID Doctor Visits", format='.2f'), alt.Tooltip("puninsured2010:Q", aggregate="mean", title="% Uninsured (as of 2010)", format='.2f')]
+#     ).transform_filter(
+#         state_selector & select_date).interactive()
+# joint_chart = States | Counties
+# st.write(joint_chart)
 st.write("Notice, that as the you move the slider from January 1st to January 31st, that the percentage of doctor visits regarding COVID are decreasing.  Feel free to explore the interactive graph by adjusting the slider for the month of January and select one or more states from the horizontal barchart on the left.")
 
 st.header("Geographical Representation")
