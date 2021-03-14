@@ -13,14 +13,14 @@ DATA = COUNTY.join(COVID.set_index("geo_value"), how = "inner", on = "cty")
 DATA['Date'] = pd.to_datetime(DATA.time_value)
 DATA['Date'] = DATA.Date.dt.strftime('%d').astype(int)
 
-st.title("% of Doctor Visits by State and County")
-st.write("In this section, we explore the percentage of doctor visits for COVID by State and County.  We begin by hilighting Pennsylvania and as we can see, there are some interesting observatins for the state.  ")
+# st.title("% of Doctor Visits by State and County")
+# st.write("In this section, we explore the percentage of doctor visits for COVID by State and County.  We begin by hilighting Pennsylvania and as we can see, there are some interesting observatins for the state.  ")
 
-alt.data_transformers.disable_max_rows()
+# alt.data_transformers.disable_max_rows()
 
-slider = alt.binding_range(min=1, max=31, step=2)
-select_date = alt.selection_single(name="January", fields=['Date'], bind=slider, init={'Date':1})
-state_selector = alt.selection_multi(fields=['statename'], init=[{'statename':'Pennsylvania'}])
+# slider = alt.binding_range(min=1, max=31, step=2)
+# select_date = alt.selection_single(name="January", fields=['Date'], bind=slider, init={'Date':1})
+# state_selector = alt.selection_multi(fields=['statename'], init=[{'statename':'Pennsylvania'}])
 
 # States = alt.Chart(DATA).mark_bar().encode(
 #     x=alt.X('value:Q', title="% of Visits to Doctor about COVID", aggregate="mean", scale=alt.Scale(domain=[0, 35])),
