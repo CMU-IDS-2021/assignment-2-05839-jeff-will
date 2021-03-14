@@ -13,7 +13,7 @@ def load_data():
     DATA = COUNTY.join(COVID.set_index("geo_value"), how = "inner", on = "cty")
     DATA['Date'] = pd.to_datetime(DATA.time_value)
     DATA['Date'] = DATA.Date.dt.strftime('%d').astype(int)
-    return DATA.sample(100)
+    return DATA[["Date", "cty", "statename", "state_id", "county_name", "value", "median_house_value", "puninsured2010"]]
 
 DATA = load_data()
 
