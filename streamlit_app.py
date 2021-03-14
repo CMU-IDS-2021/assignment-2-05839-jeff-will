@@ -5,10 +5,6 @@ import numpy as np
 import streamlit as st
 
 
-st.header("Geographical Representation")
-
-st.write("Now that we've had a chance to explore how COVID Docotor visits vary by state and county, let's look at a geographical representaion to see if we can spot any regional trends that weren't present earlier.")
-
 COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-01-to-2021-01-31.csv")
 COUNTY = pd.read_csv("health_ineq_online_table_12.csv", encoding = "latin-1")
 COUNTY["cty"] = COUNTY["cty"].astype(int)
@@ -16,6 +12,19 @@ COVID["geo_value"] = COVID["geo_value"].astype(int)
 DATA = COUNTY.join(COVID.set_index("geo_value"), how = "inner", on = "cty")
 DATA['Date'] = pd.to_datetime(DATA.time_value)
 DATA['Date'] = DATA.Date.dt.strftime('%d').astype(int)
+
+#st.title()
+#___YOUR STFF HERE
+
+
+#YOUR STUF HERE
+
+
+st.header("Geographical Representation")
+
+st.write("Now that we've had a chance to explore how COVID Docotor visits vary by state and county, let's look at a geographical representaion to see if we can spot any regional trends that weren't present earlier.")
+
+
 
 alt.data_transformers.disable_max_rows()
 
