@@ -13,8 +13,10 @@ def load_data():
     DATA = COUNTY.join(COVID.set_index("geo_value"), how = "inner", on = "cty")
     DATA['Date'] = pd.to_datetime(DATA.time_value)
     DATA['Date'] = DATA.Date.dt.strftime('%d').astype(int)
+    return DATA
+
+DATA = load_data()
     
-load_data()
 
 st.header("Geographical Representation")
 
