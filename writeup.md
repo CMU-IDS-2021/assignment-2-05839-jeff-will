@@ -1,6 +1,6 @@
 # Health, Wealth, and COVID
 
-![A screenshot of your application. Could be a GIF.](screenshot.png)
+![A screenshot of your application. Could be a GIF.](Screen Shot 2021-03-14 at 7.58.01 PM.png)
 
 ## Project Goals
 
