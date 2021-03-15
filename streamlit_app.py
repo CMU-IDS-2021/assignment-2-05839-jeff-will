@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
-@st.cache
+
 def load_data():
     COVID = pd.read_csv("covidcast-doctor-visits-smoothed_adj_cli-2021-01-01-to-2021-01-31.csv")
     COUNTY = pd.read_csv("health_ineq_online_table_12.csv", encoding = "latin-1")
