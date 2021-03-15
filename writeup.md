@@ -2,10 +2,6 @@
 
 !(Screen Shot 2021-03-14 at 7.58.01 PM.png)
 
-TODO: Update screenshot
-
-TODO: Short abstract describing the main goals and how you achieved them.
-
 ## Project Goals
 
 In a time where the divide between the rich and poor is growing vastly and health insurance is becoming more and more expensive (and subsequently) unavailable to many people, we were curious if a medical ailment such as COVID is affecting the poor more negatively than the rich. The goal of this project is to analyze the regional variations in COVID data and see if they can be explained through measures of wealth and healthcare inequality. 
