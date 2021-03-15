@@ -46,12 +46,10 @@ Counties = alt.Chart(DATA).mark_bar(color='#451076').encode(
         state_selector & select_date).interactive()
 joint_chart = States | Counties
 st.write(joint_chart)
-
-
+st.write("Notice, that as the you move the slider from January 1st to January 31st, that the percentage of doctor visits regarding COVID are decreasing.  Feel free to explore the interactive graph by adjusting the slider for the month of January and select one or more states from the horizontal barchart on the left.") 
 st.header("Geographical Representation")
 
-st.write("Notice, that as the you move the slider from January 1st to January 31st, that the percentage of doctor visits regarding COVID are decreasing.  Feel free to explore the interactive graph by adjusting the slider for the month of January and select one or more states from the horizontal barchart on the left.")
-
+st.write("Now that we've had a chance to explore how COVID Docotor visits vary by state and county, let's look at a geographical representaion to see if we can spot any regional trends that weren't present earlier.")
 
 alt.data_transformers.disable_max_rows()
 
