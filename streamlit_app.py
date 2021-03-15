@@ -17,9 +17,8 @@ def load_data():
 
 DATA = load_data()
 
-st.title("% of Doctor Visits by State and County")
-st.write("In this section, we explore the percentage of doctor visits for COVID by State and County.  We begin by hilighting Pennsylvania and as we can see, there are some interesting observatins for <> county.  As you probably noticed, there looks to be a correlation between ")
-
+st.title("Percentage of (COVID) Doctor Visits by State and County")
+st.write("In this section, we explore the percentage of doctor visits for COVID by State and County.  We begin by hilighting Pennsylvania and as we can see, there are some interesting observatins for the state.  ")
 alt.data_transformers.disable_max_rows()
 
 slider = alt.binding_range(min=1, max=31, step=1)
@@ -51,8 +50,7 @@ st.write(joint_chart)
 
 st.header("Geographical Representation")
 
-st.write("Now that we've had a chance to explore how COVID Docotor visits vary by state and county, let's look at a geographical representaion to see if we can spot any regional trends that weren't present earlier.")
-
+st.write("Notice, that as the you move the slider from January 1st to January 31st, that the percentage of doctor visits regarding COVID are decreasing.  Feel free to explore the interactive graph by adjusting the slider for the month of January and select one or more states from the horizontal barchart on the left.")
 
 
 alt.data_transformers.disable_max_rows()
